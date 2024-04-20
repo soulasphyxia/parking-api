@@ -9,6 +9,7 @@ import com.example.parkingapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,18 +20,24 @@ public class ParkingSpotService {
     private final UserRepository userRepository;
 
     public List<ParkingSpot> getAllSpots() {
-        return spotsRepository.findAll();
+        List<ParkingSpot> all = spotsRepository.findAll();
+        all.sort(Comparator.comparingInt(ParkingSpot::getLevel).thenComparingInt(ParkingSpot::getPosition));
+        return all;
     }
+
+
     public Optional<ParkingSpot> getSpot(int level, int position){
         return spotsRepository.getParkingSpotByLevelAndPosition(level,position);
     }
 
     public List<ParkingSpot> getSpotsByLevel(int level){
-        return spotsRepository.getParkingSpotsByLevel(level);
+        return spotsRepository.getParkingSpotsByLevelOrderByPosition(level);
     }
 
     public List<ParkingSpot> getSpotsByPos(int position){
-        return spotsRepository.getParkingSpotsByPosition(position);
+        List<ParkingSpot> spots = spotsRepository.getParkingSpotsByPosition(position);
+        spots.sort(Comparator.comparingInt(ParkingSpot::getPosition));
+        return spots;
     }
 
     public String addSpot(int level, int position){
@@ -67,8 +74,13 @@ public class ParkingSpotService {
         Optional<ParkingSpot> optionalSpot = spotsRepository.getParkingSpotByLevelAndPosition(parkingDTO.getLevel(), parkingDTO.getPosition());
         if(optionalSpot.isPresent()){
             ParkingSpot spot = optionalSpot.get();
-            if(spot.getIsBusy() ==parkingDTO.getIsBusy()){
+            if(spot.getIsBusy() == parkingDTO.getIsBusy()){
                 if(spot.getIsBusy()){
+                    if(spot.getUser() == null){
+                        spot.setUser(userRepository.findById(parkingDTO.getUserId()).get());
+                        spotsRepository.save(spot);
+                        return "Место перезаписано администратором";
+                    }
                     return "Это место уже занято.";
                 }else{
                     return "Это место не занято";
@@ -78,7 +90,6 @@ public class ParkingSpotService {
                 if(spot.getIsBusy()){
                     //освобождение
                     spot.setIsBusy(parkingDTO.getIsBusy());
-                    spot.setUser(null);
                     spotsRepository.save(spot);
                     return "Место успешно освобождено";
                 }else{

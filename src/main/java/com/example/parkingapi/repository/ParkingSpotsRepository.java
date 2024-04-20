@@ -10,10 +10,13 @@ import java.util.Optional;
 public interface ParkingSpotsRepository extends JpaRepository<ParkingSpot, Long> {
     Optional<ParkingSpot> getParkingSpotByLevelAndPosition(int level, int position);
 
-    List<ParkingSpot> getParkingSpotsByLevel(int level);
+    List<ParkingSpot> getParkingSpotsByLevelOrderByPosition(int level);
     List<ParkingSpot> getParkingSpotsByPosition(int position);
+
+
 
     Optional<ParkingSpot> getParkingSpotsByUser(User user);
 
     ParkingSpot findFirstByOrderByLevelDesc();
+
 }

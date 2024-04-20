@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -13,5 +15,5 @@ public class ParkingStateDTO {
     @JsonProperty("level")
     private int level;
     @JsonProperty("state")
-    private int[] state;
+    private List<Integer> state;
 }
