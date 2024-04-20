@@ -1,9 +1,6 @@
 package com.example.parkingapi.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,12 +8,12 @@ import lombok.RequiredArgsConstructor;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
-@RequiredArgsConstructor
 @Entity
+@NoArgsConstructor
 @Table(schema = "public", name = "parking_spots")
 public class ParkingSpot {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "spot_id")
     private Long spotId;
 
@@ -28,8 +25,8 @@ public class ParkingSpot {
 
     @Column(name = "busy")
     private Boolean isBusy;
-
-    @Column(name = "user_id")
-    private Long userId;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    private User user;
 
 }
