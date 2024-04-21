@@ -72,6 +72,7 @@ public class ParkingSpotService {
     * */
     public String setBusy(ParkingDTO parkingDTO){
         Optional<ParkingSpot> optionalSpot = spotsRepository.getParkingSpotByLevelAndPosition(parkingDTO.getLevel(), parkingDTO.getPosition());
+        User user = userRepository.findById(parkingDTO.getUserId()).get();
         if(optionalSpot.isPresent()){
             ParkingSpot spot = optionalSpot.get();
             if(spot.getIsBusy() == parkingDTO.getIsBusy()){
@@ -89,11 +90,14 @@ public class ParkingSpotService {
                 // true => parking.dto == false
                 if(spot.getIsBusy()){
                     //освобождение
-                    spot.setIsBusy(parkingDTO.getIsBusy());
-                    spotsRepository.save(spot);
-                    return "Место успешно освобождено";
+                    if(spot.getUser().getUserId().equals(user.getUserId())){
+                        spot.setIsBusy(parkingDTO.getIsBusy());
+                        spot.setUser(null);
+                        spotsRepository.save(spot);
+                        return "Место успешно освобождено";
+                    }
+                    return "Это место занято не вами";
                 }else{
-                    User user = userRepository.findById(parkingDTO.getUserId()).get();
                     if(spotsRepository.getParkingSpotsByUser(user).isEmpty()){
                         spot.setIsBusy(parkingDTO.getIsBusy());
                         spot.setUser(user);

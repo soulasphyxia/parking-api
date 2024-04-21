@@ -46,6 +46,7 @@ public class ParkingSpotController {
 
     @PatchMapping("/set")
     public ResponseEntity<?> setBusy(@RequestBody ParkingDTO parkingSpot){
+        System.out.println(parkingSpot);
         return ResponseEntity.ok().body(Map.of("message",spotService.setBusy(parkingSpot)));
     }
 
